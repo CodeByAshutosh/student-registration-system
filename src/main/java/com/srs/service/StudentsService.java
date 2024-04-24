@@ -1,32 +1,56 @@
 package com.srs.service;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.CallableStatementCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.srs.entity.StudentsEntity;
-import com.srs.repository.StudentRepository;
 import com.srs.request.StudentsRequest;
 import com.srs.response.ResponseObject;
-import com.srs.util.CommonUtils;
 
 @Service
 public class StudentsService {
-	
-	@Autowired
-	private StudentRepository studentRepository;
 
-	public ResponseObject addStudents(StudentsRequest studentsRequest) {
+//	@Autowired
+//	private StudentRepository studentRepository;
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
+	private static final String CHARACTERS = "0123456789";
+
+	public ResponseObject addStudents(StudentsRequest studentsRequest) throws ParseException {
 		ResponseObject response = new ResponseObject();
-		StudentsEntity studentsEntity = new StudentsEntity();
-		studentsEntity.setFirstName(studentsRequest.getFirstName());
-		studentsEntity.setLastName(studentsRequest.getLastName());
-		studentsEntity.setEmail(studentsRequest.getEmail());
-		studentsEntity.setGpa(studentsRequest.getGpa());
-		studentsEntity.setbDate(CommonUtils.convertDateStringToDate_FormateYYYYMMDDSeperatedByHyphen(studentsRequest.getBdate()));
-		studentsEntity.setStLevel(studentsRequest.getStLevel());
+
+		// StudentsEntity students =
+		// studentRepository.findByEmail(studentsRequest.getEmail());
+
+		Random random = new Random();
+		String randomNumber = String.format("%07d", Integer.valueOf(random.nextInt(10001)));
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		java.util.Date date = dateFormat.parse(studentsRequest.getBdate());
+
+		java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+		String procedureCall = "{call SAVE_STUDENT(?, ?,?,?,?,?,?)}";
+		jdbcTemplate.update(procedureCall, "B_"+randomNumber.trim(), studentsRequest.getFirstName(),
+				studentsRequest.getLastName(), studentsRequest.getStLevel(), studentsRequest.getGpa(),
+				studentsRequest.getEmail(), sqlDate);
+
+		return response;
+	}
+
+	public ResponseObject deleteStudent(String bNumber) {
+		ResponseObject response = new ResponseObject();
 		
-		studentRepository.save(studentsEntity);
-		
+		String procedureCall = "{call Delete_Student(?)}";
+		jdbcTemplate.update(procedureCall , bNumber);
 		
 		return response;
 	}

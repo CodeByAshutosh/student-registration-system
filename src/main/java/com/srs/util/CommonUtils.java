@@ -15,5 +15,20 @@ public class CommonUtils {
 		}
 		return dateObj;
 	}
+	
+	public static Date convertToDateFormat(String dateInString) {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");// "dd-MMM-yyyy"
+		// String dateInString = "7-Jun-2013";
+		Date returnDate = null;
+		try {
+			Date date = formatter.parse(dateInString);
+			// System.out.println(date);
+			returnDate = date;// formatter.format(date);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return returnDate;
+	}
 
 }
