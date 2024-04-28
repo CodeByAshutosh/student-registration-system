@@ -42,6 +42,13 @@
 			<artifactId>ojdbc10</artifactId>
 			<version>19.22.0.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.1.0-M2</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

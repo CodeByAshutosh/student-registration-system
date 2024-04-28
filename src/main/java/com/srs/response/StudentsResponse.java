@@ -1,8 +1,8 @@
-package com.srs.request;
+package com.srs.response;
 
-public class StudentsRequest {
+public class StudentsResponse {
 	
-	
+	private String bNumber;
 	private String firstName;
 	private String lastName;
 	private String stLevel;
@@ -12,13 +12,22 @@ public class StudentsRequest {
 	
 	
 	
-	public StudentsRequest(String firstName, String lastName, String stLevel, String gpa, String email, String bdate) {
+	
+	public StudentsResponse(String bNumber, String firstName, String lastName, String stLevel, String gpa, String email,
+			String bdate) {
+		this.bNumber = bNumber;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.stLevel = stLevel;
 		this.gpa = gpa;
 		this.email = email;
 		this.bdate = bdate;
+	}
+	public String getbNumber() {
+		return bNumber;
+	}
+	public void setbNumber(String bNumber) {
+		this.bNumber = bNumber;
 	}
 	public String getFirstName() {
 		return firstName;
@@ -56,6 +65,12 @@ public class StudentsRequest {
 	public void setBdate(String bdate) {
 		this.bdate = bdate;
 	}
+	@Override
+	public String toString() {
+		return "StudentsResponse [bNumber=" + bNumber + ", firstName=" + firstName + ", lastName=" + lastName
+				+ ", stLevel=" + stLevel + ", gpa=" + gpa + ", email=" + email + ", bdate=" + bdate + "]";
+	}
+	
 	
 	
 	

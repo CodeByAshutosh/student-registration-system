@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +49,30 @@ public class StudentsController {
 		}
 		return response;
 
+	}
+
+	@GetMapping(value = "/studentData")
+	public ResponseObject showStudentData() {
+		ResponseObject response = new ResponseObject();
+
+		try {
+			response = studentsService.showStudentData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+	
+	@GetMapping(value = "/studentDataByBNumber")
+	public ResponseObject studentDataByBNumber(@RequestParam("bNumber") String bNumber) {
+		ResponseObject response = new ResponseObject();
+
+		try {
+			response = studentsService.studentDataByBNumber(bNumber);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
 
 }
