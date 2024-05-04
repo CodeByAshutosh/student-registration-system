@@ -63,11 +63,12 @@ public class CoursesController {
 	}
 	
 	@GetMapping(value = "/viewCourseById")
-	public ResponseObject viewCourseById(@RequestParam("courseId") String courseId) {
+	public ResponseObject viewCourseById(@RequestParam("courseId") String courseId
+			, @RequestParam("deptCode") String deptCode) {
 		ResponseObject response = new ResponseObject();
 
 		try {
-			response = coursesService.viewCourseById(courseId);
+			response = coursesService.viewCourseById(courseId , deptCode);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

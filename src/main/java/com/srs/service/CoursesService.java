@@ -70,14 +70,14 @@ public class CoursesService {
 		return response;
 	}
 
-	public ResponseObject viewCourseById(String courseId) {
+	public ResponseObject viewCourseById(String courseId,String deptCode) {
 		ResponseObject response = new ResponseObject();
 		try {
 			CourseRequest courseRequest = new CourseRequest();
 
-			String viewCourseByIdQuery = "SELECT * FROM COURSES WHERE COURSE# = ?";
+			String viewCourseByIdQuery = "SELECT * FROM COURSES WHERE COURSE# = ? AND DEPT_CODE=? ";
 			// jdbcTemplate.batchUpdate(viewClassByIdQuery , classId);
-			jdbcTemplate.queryForObject(viewCourseByIdQuery, new Object[] { courseId }, (rs, rowNum) -> {
+			jdbcTemplate.queryForObject(viewCourseByIdQuery, new Object[] { courseId,deptCode }, (rs, rowNum) -> {
 
 				courseRequest.setDeptCode(rs.getString("DEPT_CODE"));
 				courseRequest.setCourse(rs.getString("COURSE#"));

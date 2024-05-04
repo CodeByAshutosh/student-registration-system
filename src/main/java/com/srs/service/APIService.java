@@ -263,7 +263,7 @@ public class APIService {
 			
 			if(uniqueRequest.getModule().equals("stdEnroll")) {
 				
-				String uniqueForStudentEnrollQuery = "SELECT count(*) FROM STUDENTS WHERE B# = ? OR EMAIL = '?";
+				String uniqueForStudentEnrollQuery = "SELECT count(*) FROM STUDENTS WHERE B# = ? OR EMAIL = ?";
 				int count = jdbcTemplate.queryForObject(uniqueForStudentEnrollQuery, Integer.class ,uniqueRequest.getbNumber() , uniqueRequest.getEmailId() );
 				
 				if(count ==0) {
