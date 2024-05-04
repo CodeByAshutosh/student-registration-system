@@ -51,13 +51,13 @@ public class CoursesService {
 		return response;
 	}
 
-	public ResponseObject deleteCourse(String courseId) {
+	public ResponseObject deleteCourse(String courseId,String deptCode) {
 		ResponseObject response = new ResponseObject();
 
 		try {
 
-			String deleteCourseQuery = "DELETE COURSES WHERE course# = ?";
-			jdbcTemplate.update(deleteCourseQuery, courseId);
+			String deleteCourseQuery = "DELETE COURSES WHERE course# = ? AND DEPT_CODE= ?";
+			jdbcTemplate.update(deleteCourseQuery, courseId,deptCode);
 
 			response.setStatus(true);
 			response.setSuccessMessage("course deleted");

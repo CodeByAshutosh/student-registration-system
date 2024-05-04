@@ -37,12 +37,13 @@ public class CoursesController {
 	}
 
 	@DeleteMapping(value = "/deleteCourse")
-	public ResponseObject deleteCourse(@RequestParam("courseId") String courseId) {
+	public ResponseObject deleteCourse(@RequestParam("courseId") String courseId
+			,@RequestParam("deptCode") String deptCode) {
 
 		ResponseObject response = new ResponseObject();
 
 		try {
-			response = coursesService.deleteCourse(courseId);
+			response = coursesService.deleteCourse(courseId,deptCode);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
