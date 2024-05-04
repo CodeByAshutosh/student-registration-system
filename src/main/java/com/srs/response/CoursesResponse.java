@@ -1,7 +1,6 @@
-package com.srs.request;
+package com.srs.response;
 
-public class CourseRequest {
-	
+public class CoursesResponse {
 	
 	private String deptCode;
 	private String course;
@@ -26,9 +25,9 @@ public class CourseRequest {
 	}
 	@Override
 	public String toString() {
-		return "CourseRequest [deptCode=" + deptCode + ", course=" + course + ", title=" + title + "]";
+		return "CoursesResponse [deptCode=" + deptCode + ", course=" + course + ", title=" + title + "]";
 	}
-	public CourseRequest(String deptCode, String course, String title) {
+	public CoursesResponse(String deptCode, String course, String title) {
 		this.deptCode = deptCode;
 		this.course = course;
 		this.title = title;

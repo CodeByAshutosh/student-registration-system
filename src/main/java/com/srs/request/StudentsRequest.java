@@ -2,7 +2,7 @@ package com.srs.request;
 
 public class StudentsRequest {
 	
-	
+	private String bNumber;
 	private String firstName;
 	private String lastName;
 	private String stLevel;
@@ -10,15 +10,11 @@ public class StudentsRequest {
 	private String email;
 	private String bdate;
 	
-	
-	
-	public StudentsRequest(String firstName, String lastName, String stLevel, String gpa, String email, String bdate) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.stLevel = stLevel;
-		this.gpa = gpa;
-		this.email = email;
-		this.bdate = bdate;
+	public String getbNumber() {
+		return bNumber;
+	}
+	public void setbNumber(String bNumber) {
+		this.bNumber = bNumber;
 	}
 	public String getFirstName() {
 		return firstName;
@@ -56,6 +52,19 @@ public class StudentsRequest {
 	public void setBdate(String bdate) {
 		this.bdate = bdate;
 	}
+	public StudentsRequest(String bNumber, String firstName, String lastName, String stLevel, String gpa, String email,
+			String bdate) {
+		this.bNumber = bNumber;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.stLevel = stLevel;
+		this.gpa = gpa;
+		this.email = email;
+		this.bdate = bdate;
+	}
+	
+	
+	
 	
 	
 	

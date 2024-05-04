@@ -30,24 +30,31 @@ public class StudentsService {
 	public ResponseObject addStudents(StudentsRequest studentsRequest) throws ParseException {
 		ResponseObject response = new ResponseObject();
 
-		// StudentsEntity students =
-		// studentRepository.findByEmail(studentsRequest.getEmail());
+		try {
+			
+			// StudentsEntity students =
+			// studentRepository.findByEmail(studentsRequest.getEmail());
 
-		Random random = new Random();
-		String randomNumber = String.format("%08d", Integer.valueOf(random.nextInt(10001)));
+			//Random random = new Random();
+			//String randomNumber = String.format("%08d", Integer.valueOf(random.nextInt(10001)));
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		java.util.Date date = dateFormat.parse(studentsRequest.getBdate());
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = dateFormat.parse(studentsRequest.getBdate());
 
-		java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+			java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
-		String procedureCall = "{call SAVE_STUDENT(?, ?,?,?,?,?,?)}";
-		jdbcTemplate.update(procedureCall, "B" + randomNumber.trim(), studentsRequest.getFirstName(),
-				studentsRequest.getLastName(), studentsRequest.getStLevel(), studentsRequest.getGpa(),
-				studentsRequest.getEmail(), sqlDate);
+			String procedureCall = "{call SAVE_STUDENT(?, ?,?,?,?,?,?)}";
+			jdbcTemplate.update(procedureCall, studentsRequest.getbNumber(), studentsRequest.getFirstName(),
+					studentsRequest.getLastName(), studentsRequest.getStLevel(), studentsRequest.getGpa(),
+					studentsRequest.getEmail(), sqlDate);
 
-		response.setStatus(true);
-		response.setSuccessMessage("Data Saved");
+			response.setStatus(true);
+			response.setSuccessMessage("Student data saved to database");
+		}catch (Exception e) {
+			response.setStatus(false);
+			response.setErrorMessage(e.getMessage());
+		}
+		
 
 		return response;
 	}
@@ -134,6 +141,25 @@ public class StudentsService {
 			response.setStatus(false);
 		}
 
+		return response;
+	}
+
+	public ResponseObject editStudent(StudentsRequest studentsRequest) {
+		ResponseObject response = new ResponseObject();
+		try {
+			String editStudentQuery = "UPDATE STUDENTS SET     WHERE B# = ? ";
+			
+			jdbcTemplate.update(editStudentQuery , studentsRequest.getFirstName(),studentsRequest.getLastName(),
+					studentsRequest.getStLevel(),studentsRequest.getGpa(),studentsRequest.getEmail(),
+					studentsRequest.getbNumber());
+			
+			
+			
+		}catch (Exception e) {
+			response.setStatus(false);
+			response.setErrorMessage(e.getMessage());
+		}
+		
 		return response;
 	}
 

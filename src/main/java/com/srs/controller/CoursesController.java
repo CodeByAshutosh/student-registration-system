@@ -47,12 +47,12 @@ public class CoursesController {
 
 	}
 
-	@GetMapping(value = "/courseData")
-	public ResponseObject courseData() {
+	@GetMapping(value = "/showCourse")
+	public ResponseObject showCourse() {
 		ResponseObject response = new ResponseObject();
 
 		try {
-			response = coursesService.courseData();
+			response = coursesService.showCourse();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
