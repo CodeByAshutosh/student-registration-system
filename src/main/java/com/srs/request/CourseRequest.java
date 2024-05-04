@@ -6,6 +6,11 @@ public class CourseRequest {
 	private String deptCode;
 	private String course;
 	private String title;
+	
+	
+	public CourseRequest() {
+		// TODO Auto-generated constructor stub
+	}
 	public String getDeptCode() {
 		return deptCode;
 	}

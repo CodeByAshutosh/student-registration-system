@@ -7,11 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.srs.request.ClassesRequest;
 import com.srs.request.CourseRequest;
 import com.srs.response.ResponseObject;
 import com.srs.service.CoursesService;
@@ -59,17 +62,33 @@ public class CoursesController {
 		return response;
 	}
 	
-	@GetMapping(value = "/courseDataByCourseId")
-	public ResponseObject courseDataByCourseId(@RequestParam("courseId") String courseId) {
+	@GetMapping(value = "/viewCourseById")
+	public ResponseObject viewCourseById(@RequestParam("courseId") String courseId) {
 		ResponseObject response = new ResponseObject();
 
 		try {
-			response = coursesService.courseDataByCourseId(courseId);
+			response = coursesService.viewCourseById(courseId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return response;
 	}
+	
+	@PutMapping(value = "/editCourse/{courseId}")
+	public ResponseObject editCourse(@PathVariable String courseId ,@RequestBody CourseRequest courseRequest) {
+		ResponseObject response = new ResponseObject();
+
+		try {
+			courseRequest.setCourse(courseId);
+			response = coursesService.editCourse(courseRequest);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return response;
+	}
+	
+
 	
 	
 

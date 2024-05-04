@@ -58,7 +58,7 @@ public class APIController {
 	}
 	
 	
-	@PostMapping(value = "/enrollStudent")
+	@GetMapping(value = "/enrollStudent")
 	public ResponseObject enrollStudent(@RequestParam("bNumber") String bNumber , @RequestParam("classId") String classId) {
 		ResponseObject response = new ResponseObject();
 

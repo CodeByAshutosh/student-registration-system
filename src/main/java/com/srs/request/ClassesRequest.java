@@ -11,6 +11,11 @@ public class ClassesRequest {
 	private String limit;
 	private String classSize;
 	private String room;
+	
+	
+	public ClassesRequest() {
+		// TODO Auto-generated constructor stub
+	}
 	public String getClassId() {
 		return classId;
 	}

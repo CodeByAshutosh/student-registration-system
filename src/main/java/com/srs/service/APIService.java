@@ -1,9 +1,15 @@
 package com.srs.service;
 
+import java.sql.Array;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +17,8 @@ import com.srs.request.UniqueRequest;
 import com.srs.response.EnrollmentsResponse;
 import com.srs.response.LogResponse;
 import com.srs.response.ResponseObject;
+
+import oracle.jdbc.OracleTypes;
 
 @Service
 public class APIService {
@@ -20,6 +28,15 @@ public class APIService {
 	
 	@Autowired
 	private OracleService oracleService;
+	
+	@Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
 	public ResponseObject saveScore(String score, String lGrade) {
 		ResponseObject response= new ResponseObject();
@@ -151,8 +168,44 @@ public class APIService {
 
 	public ResponseObject enrollStudent(String bNumber, String classId) {
 		ResponseObject response = new ResponseObject();
-		
+		 String[] lines = null;
 		try {
+			
+			String enrollStudents = "enroll_grad_stu('"+bNumber+"','"+classId+"')";
+			
+			String procedureCall = "{ call ashukla4_proj2_package_spc." + enrollStudents + "}";
+	        
+	        try (Connection connection = DriverManager.getConnection(url, username, password);
+	             CallableStatement enableOutput = connection.prepareCall("BEGIN DBMS_OUTPUT.ENABLE(NULL); END;");
+	             CallableStatement callableStatement = connection.prepareCall(procedureCall);
+	             CallableStatement getBuffer = connection.prepareCall("BEGIN DBMS_OUTPUT.GET_LINES(?, ?); END;")) {
+	            
+	            // Enable server output
+	            enableOutput.execute();
+
+	            // Call the stored procedure
+	            callableStatement.execute();
+
+	            // Prepare to retrieve the server output
+	            getBuffer.registerOutParameter(1, OracleTypes.ARRAY, "DBMSOUTPUT_LINESARRAY");
+	            getBuffer.registerOutParameter(2, OracleTypes.INTEGER);
+	            getBuffer.execute();
+
+	            // Retrieve the output
+	            Array array = getBuffer.getArray(1);
+	            if (array != null) {
+	                 lines = (String[]) array.getArray();
+	                 
+	                 response.setStatus(true);
+	                 response.setSuccessMessage(lines[0].trim().toString());
+	                // System.out.println("lines"+lines);
+	                
+	            }
+
+	        } catch (SQLException e) {
+	            e.printStackTrace(); // Consider using a logger here
+	        }
+	        
 			
 			
 			
@@ -168,7 +221,7 @@ public class APIService {
 		ResponseObject response = new ResponseObject();
 		try {
 			
-			String addScoreQuery = "Insert INTO G_ENROLLMENTS(SCORE , LGRADE) VALUES(?,?,?)";
+			String addScoreQuery = "Insert INTO G_ENROLLMENTS(G_B#, CLASSID,SCORE) VALUES(?,?,?)";
 			jdbcTemplate.update(addScoreQuery , bNumber,classId,score);
 
 			response.setStatus(true);
@@ -188,7 +241,11 @@ public class APIService {
 		ResponseObject response = new ResponseObject();
 		try {
 			
-			
+			String addScoreQuery = "DELETE G_ENROLLMENTS WHERE G_B# = ? AND CLASSID = ?";
+			jdbcTemplate.update(addScoreQuery , bNumber,classId);
+
+			response.setStatus(true);
+			response.setSuccessMessage("Score and grade data saved");
 			
 			
 			
@@ -203,6 +260,36 @@ public class APIService {
 	public ResponseObject uniqueData(UniqueRequest uniqueRequest) {
 		ResponseObject response = new ResponseObject();
 		try {
+			
+			if(uniqueRequest.getModule().equals("stdEnroll")) {
+				
+				String uniqueForStudentEnrollQuery = "SELECT count(*) FROM STUDENTS WHERE B# = ? OR EMAIL = '?";
+				int count = jdbcTemplate.queryForObject(uniqueForStudentEnrollQuery, Integer.class ,uniqueRequest.getbNumber() , uniqueRequest.getEmailId() );
+				
+				if(count ==0) {
+					response.setStatus(true);
+					response.setSuccessMessage("provided data is unique");
+					
+				}else {
+					
+					response.setStatus(false);
+					response.setErrorMessage("BNumber or email not unique");
+					
+				}
+				
+			}else if(uniqueRequest.getModule().equals("classEnroll")) {
+				
+				String uniqueForClassEnrollQuery = "SELECT * FROM CLASSES WHERE DEPT_CODE = ? AND COURSE# = ? AND SECT#=? AND YEAR=? AND SEMESTER = ?";
+				int count = jdbcTemplate.queryForObject(uniqueForClassEnrollQuery, Integer.class ,uniqueRequest.getDeptCode() , uniqueRequest.getCourse(), uniqueRequest.getSection(),uniqueRequest.getYear(),uniqueRequest.getSemester());
+				
+				if(count ==0) {
+					response.setStatus(true);
+					response.setSuccessMessage("provided data is unique");
+				}else {
+					response.setStatus(false);
+					response.setErrorMessage("data already exist in database. Please use different");
+				}
+			}
 			
 		}catch (Exception e) {
 			response.setStatus(false);

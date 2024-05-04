@@ -1,5 +1,6 @@
 package com.srs.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,6 +119,63 @@ public class ClassesService {
 			response.setStatus(true);
 			response.setSuccessMessage("course deleted");
 			
+			
+		}catch (Exception e) {
+			response.setStatus(false);
+			response.setErrorMessage(e.getMessage());
+		}
+		
+		return response;
+	}
+
+	public ResponseObject viewClassById(String classId) {
+		ResponseObject response = new ResponseObject();
+		try {
+			ClassesRequest classesRequest = new ClassesRequest();
+			
+			String viewClassByIdQuery = "SELECT * FROM classes WHERE CLASSID = ?";
+			//jdbcTemplate.batchUpdate(viewClassByIdQuery , classId);
+			jdbcTemplate.queryForObject(viewClassByIdQuery, new Object[] {classId},
+					(rs,rowNum) -> {
+						
+						classesRequest.setClassId(rs.getString("CLASSID"));
+						classesRequest.setDeptCode(rs.getString("DEPT_CODE"));
+						classesRequest.setCourse(rs.getString("COURSE#"));
+						classesRequest.setSect(rs.getString("SECT#"));
+						classesRequest.setYear(rs.getString("YEAR"));
+						classesRequest.setSemester(rs.getString("SEMESTER"));
+						classesRequest.setLimit(rs.getString("LIMIT"));
+						classesRequest.setClassSize(rs.getString("CLASS_SIZE"));
+						classesRequest.setRoom(rs.getString("ROOM"));
+						
+						return classesRequest;
+					});
+			
+			response.setStatus(true);
+			response.setSuccessMessage("class data by classId");
+			response.setResponse(classesRequest);
+			
+			
+		}catch (Exception e) {
+			response.setStatus(false);
+			response.setErrorMessage(e.getMessage());
+		}
+		
+		return response;
+	}
+
+	public ResponseObject editClass(ClassesRequest classesRequest) {
+		ResponseObject response = new ResponseObject();
+		try {
+			
+			
+			String editStudentQuery = "UPDATE CLASSES SET DEPT_CODE = ?, COURSE# = ?,SECT#=?,YEAR=?,SEMESTER=?,LIMIT=?,CLASS_SIZE=?,ROOM=? WHERE CLASSID=?";
+			
+			jdbcTemplate.update(editStudentQuery , classesRequest.getDeptCode(),classesRequest.getCourse(),classesRequest.getSect(),classesRequest.getYear(),classesRequest.getSemester(),classesRequest.getLimit(),classesRequest.getClassSize(),classesRequest.getRoom(),
+					classesRequest.getClassId());
+			
+			response.setStatus(true);
+			response.setSuccessMessage("class data successfully update");
 			
 		}catch (Exception e) {
 			response.setStatus(false);

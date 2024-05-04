@@ -11,6 +11,7 @@ class StudentRowMapper implements RowMapper<StudentsRequest> {
     @Override
     public StudentsRequest mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         return new StudentsRequest(
+        		resultSet.getString("bNumber"),
         		resultSet.getString("firstName"),
 				 resultSet.getString("lastName"),
 				 resultSet.getString("stLevel"),

@@ -1,6 +1,11 @@
 package com.srs.service;
 
+import java.sql.Array;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,12 +13,15 @@ import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.srs.request.StudentsRequest;
 import com.srs.response.ResponseObject;
 import com.srs.response.StudentsResponse;
+
+import oracle.jdbc.OracleTypes;
 
 @Service
 public class StudentsService {
@@ -27,16 +35,26 @@ public class StudentsService {
 	@Autowired
 	private OracleService oracleService;
 
+	@Value("${spring.datasource.url}")
+	private String url;
+
+	@Value("${spring.datasource.username}")
+	private String username;
+
+	@Value("${spring.datasource.password}")
+	private String password;
+
 	public ResponseObject addStudents(StudentsRequest studentsRequest) throws ParseException {
 		ResponseObject response = new ResponseObject();
 
 		try {
-			
+
 			// StudentsEntity students =
 			// studentRepository.findByEmail(studentsRequest.getEmail());
 
-			//Random random = new Random();
-			//String randomNumber = String.format("%08d", Integer.valueOf(random.nextInt(10001)));
+			// Random random = new Random();
+			// String randomNumber = String.format("%08d",
+			// Integer.valueOf(random.nextInt(10001)));
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			java.util.Date date = dateFormat.parse(studentsRequest.getBdate());
@@ -50,23 +68,64 @@ public class StudentsService {
 
 			response.setStatus(true);
 			response.setSuccessMessage("Student data saved to database");
-		}catch (Exception e) {
+		} catch (Exception e) {
 			response.setStatus(false);
 			response.setErrorMessage(e.getMessage());
 		}
-		
 
 		return response;
 	}
 
 	public ResponseObject deleteStudent(String bNumber) {
 		ResponseObject response = new ResponseObject();
+		String[] lines = null;
+		try {
 
-		String procedureCall = "{call Delete_Student(?)}";
-		jdbcTemplate.update(procedureCall, bNumber);
+			String deleteStudents = "delete_student('" + bNumber + "')";
 
-		response.setStatus(true);
-		response.setSuccessMessage("Student data deleted : " + bNumber);
+			String procedureCall = "{ call ashukla4_proj2_package_spc." + deleteStudents + "}";
+
+			try (Connection connection = DriverManager.getConnection(url, username, password);
+					CallableStatement enableOutput = connection.prepareCall("BEGIN DBMS_OUTPUT.ENABLE(NULL); END;");
+					CallableStatement callableStatement = connection.prepareCall(procedureCall);
+					CallableStatement getBuffer = connection.prepareCall("BEGIN DBMS_OUTPUT.GET_LINES(?, ?); END;")) {
+
+				// Enable server output
+				enableOutput.execute();
+
+				// Call the stored procedure
+				callableStatement.execute();
+
+				// Prepare to retrieve the server output
+				getBuffer.registerOutParameter(1, OracleTypes.ARRAY, "DBMSOUTPUT_LINESARRAY");
+				getBuffer.registerOutParameter(2, OracleTypes.INTEGER);
+				getBuffer.execute();
+
+				// Retrieve the output
+				Array array = getBuffer.getArray(1);
+				if (array != null) {
+					lines = (String[]) array.getArray();
+					if(lines.length != 0) {
+						response.setStatus(true);
+						response.setSuccessMessage(lines[0].trim().toString());
+						// System.out.println("lines"+lines);
+					}else {
+						response.setStatus(false);
+					}
+					
+
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace(); // Consider using a logger here
+				response.setStatus(false);
+				response.setErrorMessage(e.getMessage());
+			}
+
+		} catch (Exception e) {
+			response.setStatus(false);
+			response.setErrorMessage(e.getMessage());
+		}
 
 		return response;
 	}
@@ -147,19 +206,25 @@ public class StudentsService {
 	public ResponseObject editStudent(StudentsRequest studentsRequest) {
 		ResponseObject response = new ResponseObject();
 		try {
-			String editStudentQuery = "UPDATE STUDENTS SET     WHERE B# = ? ";
-			
-			jdbcTemplate.update(editStudentQuery , studentsRequest.getFirstName(),studentsRequest.getLastName(),
-					studentsRequest.getStLevel(),studentsRequest.getGpa(),studentsRequest.getEmail(),
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = dateFormat.parse(studentsRequest.getBdate());
+
+			java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+			String editStudentQuery = "UPDATE STUDENTS SET FIRST_NAME = ? ,LAST_NAME =?,ST_LEVEL =?,GPA= ?,EMAIL=?,BDATE=? WHERE B# = ?";
+
+			jdbcTemplate.update(editStudentQuery, studentsRequest.getFirstName(), studentsRequest.getLastName(),
+					studentsRequest.getStLevel(), studentsRequest.getGpa(), studentsRequest.getEmail(), sqlDate,
 					studentsRequest.getbNumber());
-			
-			
-			
-		}catch (Exception e) {
+
+			response.setStatus(true);
+			response.setSuccessMessage("Student data successfully update");
+
+		} catch (Exception e) {
 			response.setStatus(false);
 			response.setErrorMessage(e.getMessage());
 		}
-		
+
 		return response;
 	}
 
