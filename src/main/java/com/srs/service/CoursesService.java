@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.srs.request.ClassesRequest;
 import com.srs.request.CourseRequest;
 import com.srs.response.CoursesResponse;
 import com.srs.response.ResponseObject;
@@ -20,14 +20,25 @@ public class CoursesService {
 
 	@Autowired
 	private OracleService oracleService;
+	
+	@Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
 	public ResponseObject addCourses(CourseRequest courseRequest) {
 		ResponseObject response = new ResponseObject();
 		try {
 
 			String addCoursesSql = "INSERT INTO COURSES(DEPT_CODE,COURSE#,TITLE) VALUES(?,?,?)";
-			jdbcTemplate.batchUpdate(addCoursesSql, courseRequest.getCourse(), courseRequest.getDeptCode(),
+			jdbcTemplate.update(addCoursesSql, courseRequest.getDeptCode(), courseRequest.getCourse(),
 					courseRequest.getTitle());
+			
+			
 
 			response.setStatus(true);
 			response.setSuccessMessage("courses data saved to database");
@@ -46,7 +57,7 @@ public class CoursesService {
 		try {
 
 			String deleteCourseQuery = "DELETE COURSES WHERE course# = ?";
-			jdbcTemplate.batchUpdate(deleteCourseQuery, courseId);
+			jdbcTemplate.update(deleteCourseQuery, courseId);
 
 			response.setStatus(true);
 			response.setSuccessMessage("course deleted");

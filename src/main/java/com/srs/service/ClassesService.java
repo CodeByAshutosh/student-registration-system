@@ -1,10 +1,14 @@
 package com.srs.service;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +26,23 @@ public class ClassesService {
 	@Autowired
 	private OracleService oracleService;
 
+	@Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
+    
 	public ResponseObject addClasses(ClassesRequest classesRequest) {
 
 		ResponseObject response = new ResponseObject();
 		try {
 			String addClassesQuery = "INSERT INTO CLASSES(CLASSID,DEPT_CODE,COURSE#,SECT#,YEAR,SEMESTER,LIMIT,CLASS_SIZE,ROOM) VALUES(?,?,?,?,?,?,?,?,?)";
-			jdbcTemplate.batchUpdate(addClassesQuery ,classesRequest.getClassId() , classesRequest.getDeptCode(),classesRequest.getCourse(),classesRequest.getSect(),classesRequest.getYear(),
+			jdbcTemplate.update(addClassesQuery ,classesRequest.getClassId() , classesRequest.getDeptCode(),classesRequest.getCourse(),classesRequest.getSect(),classesRequest.getYear(),
 					classesRequest.getSemester(),classesRequest.getLimit(),classesRequest.getClassSize(),classesRequest.getRoom());
+			
 			
 			response.setStatus(true);
 			response.setSuccessMessage("Classes data saved to database");
@@ -114,7 +128,7 @@ public class ClassesService {
 		try {
 			
 			String deleteCourseQuery = "DELETE CLASSES WHERE CLASSID = ?";
-			jdbcTemplate.batchUpdate(deleteCourseQuery , classId);
+			jdbcTemplate.update(deleteCourseQuery , classId);
 			
 			response.setStatus(true);
 			response.setSuccessMessage("course deleted");

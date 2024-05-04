@@ -71,7 +71,7 @@ public class APIController {
 		return response;
 	}
 	
-	@PostMapping(value = "/saveEnrollments")
+	@GetMapping(value = "/saveEnrollments")
 	public ResponseObject saveEnrollments(@RequestParam("bNumber") String bNumber , @RequestParam("classId") String classId,
 			@RequestParam("score") String score) {
 		ResponseObject response = new ResponseObject();
@@ -113,6 +113,18 @@ public class APIController {
 		return response;
 	}
 	
+	
+	@GetMapping(value = "/listStudentByClass")
+	public ResponseObject listStudentByClassId(@RequestParam("classId") String classId) {
+		ResponseObject response = new ResponseObject();
+
+		try {
+			response = apiService.listStudentByClassId(classId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 	
 	
 	

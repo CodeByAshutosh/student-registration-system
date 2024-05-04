@@ -299,4 +299,15 @@ public class APIService {
 		return response;
 	}
 
+	public ResponseObject listStudentByClassId(String classId) {
+		ResponseObject response = new ResponseObject();
+		try {
+			
+		}catch(Exception e) {
+			response.setStatus(false);
+			response.setErrorMessage(e.getMessage());
+		}
+		return response;
+	}
+
 }
