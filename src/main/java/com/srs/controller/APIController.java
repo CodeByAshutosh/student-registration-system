@@ -59,11 +59,12 @@ public class APIController {
 	
 	
 	@GetMapping(value = "/enrollStudent")
-	public ResponseObject enrollStudent(@RequestParam("bNumber") String bNumber , @RequestParam("classId") String classId) {
+	public ResponseObject enrollStudent(@RequestParam("bNumber") String bNumber , @RequestParam("classId") String classId,
+			@RequestParam("score") String score) {
 		ResponseObject response = new ResponseObject();
 
 		try {
-			response = apiService.enrollStudent(bNumber , classId);
+			response = apiService.enrollStudent(bNumber , classId, score);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +78,7 @@ public class APIController {
 		ResponseObject response = new ResponseObject();
 
 		try {
-			response = apiService.saveEnrollments(bNumber , classId,score);
+			response = apiService.enrollStudent(bNumber , classId,score);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

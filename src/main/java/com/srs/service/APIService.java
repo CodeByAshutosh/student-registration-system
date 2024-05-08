@@ -166,12 +166,12 @@ public class APIService {
 		return response;
 	}
 
-	public ResponseObject enrollStudent(String bNumber, String classId) {
+	public ResponseObject enrollStudent(String bNumber, String classId, String score) {
 		ResponseObject response = new ResponseObject();
 		 String[] lines = null;
 		try {
 			
-			String enrollStudents = "enroll_grad_stu('"+bNumber+"','"+classId+"')";
+			String enrollStudents = "enroll_grad_stud('"+bNumber+"','"+classId+"')";
 			
 			String procedureCall = "{ call ashukla4_proj2_package_spc." + enrollStudents + "}";
 	        
@@ -239,14 +239,44 @@ public class APIService {
 
 	public ResponseObject deleteEnrollments(String bNumber, String classId) {
 		ResponseObject response = new ResponseObject();
+		String[] lines = null;
 		try {
 			
-			String addScoreQuery = "DELETE G_ENROLLMENTS WHERE G_B# = ? AND CLASSID = ?";
-			jdbcTemplate.update(addScoreQuery , bNumber,classId);
-
-			response.setStatus(true);
-			response.setSuccessMessage("Score and grade data saved");
+			String dropStudents = "drop_grad_student('"+bNumber+"','"+classId+"')";
 			
+			String procedureCall = "{ call ashukla4_proj2_package_spc." + dropStudents + "}";
+	        
+	        try (Connection connection = DriverManager.getConnection(url, username, password);
+	             CallableStatement enableOutput = connection.prepareCall("BEGIN DBMS_OUTPUT.ENABLE(NULL); END;");
+	             CallableStatement callableStatement = connection.prepareCall(procedureCall);
+	             CallableStatement getBuffer = connection.prepareCall("BEGIN DBMS_OUTPUT.GET_LINES(?, ?); END;")) {
+	            
+	            // Enable server output
+	            enableOutput.execute();
+
+	            // Call the stored procedure
+	            callableStatement.execute();
+
+	            // Prepare to retrieve the server output
+	            getBuffer.registerOutParameter(1, OracleTypes.ARRAY, "DBMSOUTPUT_LINESARRAY");
+	            getBuffer.registerOutParameter(2, OracleTypes.INTEGER);
+	            getBuffer.execute();
+
+	            // Retrieve the output
+	            Array array = getBuffer.getArray(1);
+	            if (array != null) {
+	                 lines = (String[]) array.getArray();
+	                 
+	                 response.setStatus(true);
+	                 response.setSuccessMessage(lines[0].trim().toString());
+	                // System.out.println("lines"+lines);
+	                
+	            }
+
+	        } catch (SQLException e) {
+	            e.printStackTrace(); // Consider using a logger here
+	        }
+	        
 			
 			
 			
@@ -254,6 +284,7 @@ public class APIService {
 			response.setStatus(false);
 			response.setErrorMessage(e.getMessage());
 		}
+		
 		return response;
 	}
 
